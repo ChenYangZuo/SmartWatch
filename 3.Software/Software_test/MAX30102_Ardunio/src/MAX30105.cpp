@@ -1,15 +1,6 @@
-/***************************************************
-  This is a library written for the Maxim MAX30105 Optical Smoke Detector
-  It should also work with the MAX30102. However, the MAX30102 does not have a Green LED.
-
-  These sensors use I2C to communicate, as well as a single (optional)
-  interrupt line that is not currently supported in this driver.
-
-  Written by Peter Jansen and Nathan Seidle (SparkFun)
-  BSD license, all text above must be included in any redistribution.
- *****************************************************/
-
 #include "MAX30105.h"
+
+/*--------------------Registers Map--------------------*/
 
 // Status Registers
 static const uint8_t MAX30105_INTSTAT1 =		0x00;
@@ -26,11 +17,9 @@ static const uint8_t MAX30105_FIFODATA =		0x07;
 // Configuration Registers
 static const uint8_t MAX30105_FIFOCONFIG = 		0x08;
 static const uint8_t MAX30105_MODECONFIG = 		0x09;
-static const uint8_t MAX30105_PARTICLECONFIG = 	0x0A;    // Note, sometimes listed as "SPO2" config in datasheet (pg. 11)
+static const uint8_t MAX30105_SPO2CONFIG = 	0x0A;
 static const uint8_t MAX30105_LED1_PULSEAMP = 	0x0C;
 static const uint8_t MAX30105_LED2_PULSEAMP = 	0x0D;
-static const uint8_t MAX30105_LED3_PULSEAMP = 	0x0E;
-static const uint8_t MAX30105_LED_PROX_AMP = 	0x10;
 static const uint8_t MAX30105_MULTILEDCONFIG1 = 0x11;
 static const uint8_t MAX30105_MULTILEDCONFIG2 = 0x12;
 
@@ -39,14 +28,14 @@ static const uint8_t MAX30105_DIETEMPINT = 		0x1F;
 static const uint8_t MAX30105_DIETEMPFRAC = 	0x20;
 static const uint8_t MAX30105_DIETEMPCONFIG = 	0x21;
 
-// Proximity Function Registers
-static const uint8_t MAX30105_PROXINTTHRESH = 	0x30;
-
 // Part ID Registers
 static const uint8_t MAX30105_REVISIONID = 		0xFE;
 static const uint8_t MAX30105_PARTID = 			0xFF;    // Should always be 0x15. Identical to MAX30102.
 
-// MAX30105 Commands
+/*--------------------Registers Map--------------------*/
+
+/*--------------------Commands--------------------*/
+
 // Interrupt configuration (pg 13, 14)
 static const uint8_t MAX30105_INT_A_FULL_MASK =		(byte)~0b10000000;
 static const uint8_t MAX30105_INT_A_FULL_ENABLE = 	0x80;
@@ -135,14 +124,14 @@ static const uint8_t SLOT_GREEN_PILOT = 		0x07;
 
 static const uint8_t MAX_30105_EXPECTEDPARTID = 0x15;
 
+/*--------------------Commands--------------------*/
+
 //The MAX30105 stores up to 32 samples on the IC
 //This is additional local storage to the microcontroller
 const int STORAGE_SIZE = 4; //Each long is 4 bytes so limit this to fit on your micro
-struct Record
-{
+struct Record {
   uint32_t red[STORAGE_SIZE];
   uint32_t IR[STORAGE_SIZE];
-  uint32_t green[STORAGE_SIZE];
   byte head;
   byte tail;
 } sense; //This is our circular buffer of readings from the sensor
