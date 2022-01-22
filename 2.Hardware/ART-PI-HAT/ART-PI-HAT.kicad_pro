@@ -397,7 +397,7 @@
       "idf": "",
       "netlist": "",
       "specctra_dsn": "",
-      "step": "",
+      "step": "ART-PI-HAT.step",
       "vrml": ""
     },
     "page_layout_descr_file": ""
